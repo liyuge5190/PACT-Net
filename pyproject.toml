@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pactnet"
+version = "1.0.0"
+description = "Markerless quantification of long jump takeoff mechanics and external limb loading"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+train = ["torch>=2.0"]
+calibration = ["opencv-python>=4.7"]
+test = ["pytest>=7"]
+
+[tool.setuptools]
+packages = ["pactnet"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

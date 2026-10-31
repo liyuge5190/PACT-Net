@@ -1,0 +1,74 @@
+# Configuration of the full model (Table 3 of the manuscript).
+
+data:
+  raw_dir: data/raw
+  cache_dir: data/cache
+  fps: 200
+  calibration_window: [-121, 120]   # frames about the estimated touchdown (-605 ms to +600 ms)
+  network_window: 121               # frames centred on the estimated touchdown
+
+fusion:
+  heteroscedastic: true
+  heatmap_temperature: 0.05         # kappa, Eq. (3)
+  information_eps: 1.0              # epsilon, Eq. (7), px^2
+  robust_scale: 12.0                # c, Eq. (9) and (12), px
+  iterations: 3
+
+calibration:
+  gravity_anchoring: true           # false: stature-based scale and camera-based vertical
+  g0: 9.81
+  flight_trim: 2                    # frames removed at both ends of each flight window
+
+model:
+  num_joints: 20
+  hidden: 256
+  blocks: 8
+  heads: 8
+  gated_heads: 4                    # heads with learnable gamma_h > 0, Eq. (20)
+  event_beta: 1.0                   # beta (frames), Eq. (18) and (20)
+  softargmax_temperature: 0.5       # varsigma, Eq. (17)
+  phase_normalized_encoding: true   # Eq. (21)
+  discontinuity_attention: true     # Eq. (20)
+  dropout: 0.1
+
+derivatives:
+  phase_adaptive: true
+  h_contact: 5                      # frames
+  h_flight: 15                      # frames
+
+anatomy:
+  joint_centre_correction: true
+  offset_regularizer: 0.01          # lambda_delta, Eq. (25)
+
+physics:
+  enabled: true
+  lambda_smooth: 0.5                # lambda_1, Eq. (29)
+  lambda_physics: 5.0               # lambda_2
+  lambda_anatomy: 1.0               # lambda_3
+  lambda_limits: 2.0                # lambda_4
+  friction: 0.9                     # mu, Eq. (28)
+  margin: 10
+
+loss:
+  lambda_u: 0.1
+  lambda_e: 1.0
+  lambda_p: 0.05
+  lambda_b: 0.2
+  lambda_d: 0.5
+
+train:
+  epochs: 90
+  batch_size: 12
+  lr: 3.0e-4
+  weight_decay: 0.01
+  eval_every: 2
+  seeds: [0, 1, 2]
+  augment:
+    mirror: true
+    view_dropout: 0.3
+    keypoint_jitter_px: 2.0
+    crop_jitter: 5
+
+uncertainty:
+  z: 1.96
+  chunk: 256
